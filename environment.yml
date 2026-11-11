@@ -1,0 +1,17 @@
+name: wafer
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pandas
+  - numpy
+  - matplotlib
+  - seaborn
+  - scikit-learn
+  - scikit-image
+  - scipy
+  - lightgbm
+  - xgboost
+  - jupyterlab
+  - ipykernel
+  - pyarrow

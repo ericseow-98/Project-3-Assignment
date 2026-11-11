@@ -1,0 +1,14 @@
+# Data (too large for GitHub — see README for how to obtain)
+*.pkl
+*.zip
+data/
+
+# Python / Jupyter
+__pycache__/
+.ipynb_checkpoints/
+
+# Trained model (regenerate with notebooks/03_modelling.ipynb)
+models/
+
+# Course brief (not ours to redistribute)
+Module 3 Project Assignment.pdf
