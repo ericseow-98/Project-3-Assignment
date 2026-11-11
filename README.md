@@ -44,7 +44,10 @@ Requires [conda](https://docs.conda.io/) (Miniconda is enough).
 ```bash
 conda env create -f environment.yml
 conda activate wafer
+python -m ipykernel install --sys-prefix --name wafer --display-name "Python 3 (wafer)"
 ```
+
+The last line registers the environment as a Jupyter kernel; the notebooks are set to use "Python 3 (wafer)".
 
 ## Reproduce the results
 
@@ -57,6 +60,7 @@ Run from the project root, in order:
 | 3 | `notebooks/01_eda.ipynb` | Exploratory analysis: 6 findings that shaped the modelling | ~1 min |
 | 4 | `notebooks/02_features.ipynb` | Explains and checks the features and the split | ~1 min |
 | 5 | `notebooks/03_modelling.ipynb` | Compares 4 models, tunes LightGBM, saves `models/lgbm_tuned.joblib` | ~15 min |
+| 5b | `notebooks/03b_grid_search.ipynb` | Grid search on `reg_lambda` × `num_leaves` around the final model (optional check) | ~17 min |
 | 6 | `notebooks/04_evaluation.ipynb` | One-time evaluation on the sealed test set + error analysis | ~1 min |
 | 7 | `notebooks/05_opportunity_sizing.ipynb` | Business value calculator with editable assumptions | seconds |
 
@@ -64,7 +68,7 @@ Run from the project root, in order:
 that file to re-run the full hyperparameter search (~40 min).
 
 Run notebooks interactively with `jupyter lab`, or headless with
-`jupyter nbconvert --to notebook --execute --inplace notebooks/<name>.ipynb`.
+`jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=wafer notebooks/<name>.ipynb`.
 
 **Note on the raw file:** `LSWMD.pkl` was pickled under Python 2 with an old pandas, so `pd.read_pickle` fails.
 `src/prepare_data.py` handles this with pandas' compatibility unpickler and `encoding="latin1"`.
@@ -82,7 +86,8 @@ Run notebooks interactively with `jupyter lab`, or headless with
 4. **Models:** majority-class baseline → logistic regression → Random Forest → LightGBM, all with class weights,
    compared on the same 5 lot-grouped folds.
 5. **Tuning:** randomized search (25 configurations, 3-fold grouped CV), then the top 3 re-checked on 5 folds;
-   ties broken in favour of higher defect recall.
+   ties broken in favour of higher defect recall. A 3×3 grid search on `reg_lambda` × `num_leaves` then
+   confirmed no setting beats the final model beyond noise.
 
 ## Results
 
@@ -119,6 +124,8 @@ rest to engineers — and retrain on the fab's own data first.
 .
 ├── README.md
 ├── environment.yml              # conda environment "wafer"
+├── docs/
+│   └── JOURNAL.md               # project journal: decisions, problems, reasoning
 ├── src/
 │   ├── prepare_data.py          # raw LSWMD.pkl → labelled wafers
 │   ├── features.py              # one wafer map → 69 features
@@ -127,12 +134,14 @@ rest to engineers — and retrain on the fab's own data first.
 │   ├── 01_eda.ipynb
 │   ├── 02_features.ipynb
 │   ├── 03_modelling.ipynb
+│   ├── 03b_grid_search.ipynb
 │   ├── 04_evaluation.ipynb
 │   └── 05_opportunity_sizing.ipynb
 ├── reports/
 │   ├── figures/                 # charts and diagrams used in the presentation
 │   ├── model_comparison.csv
-│   ├── tuning_results.csv       # cached hyperparameter search
+│   ├── tuning_results.csv       # cached random search
+│   ├── grid_search_results.csv  # cached grid search
 │   ├── test_metrics.csv
 │   └── opportunity_sizing.csv
 ├── data/                        # generated, not in git
